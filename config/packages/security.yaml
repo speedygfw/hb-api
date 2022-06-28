@@ -29,6 +29,8 @@ security:
             pattern:   ^/api
             stateless: true
             jwt: ~
+            allow_origin: ['*']
+            allow_headers: ['*']
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
