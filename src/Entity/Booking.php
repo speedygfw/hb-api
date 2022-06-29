@@ -22,7 +22,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter;
     itemOperations: [
         'get' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
         'patch' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
-        'post' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
+        #'post' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
         'put' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
         'delete' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"]
     

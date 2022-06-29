@@ -9,7 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * This extension makes sure normal users can only access their own Addresses and PRofiles
+ * This extension makes sure normal users can only access their own contracts and transactions
  */
 final class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
