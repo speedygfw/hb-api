@@ -19,7 +19,14 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter;
 
 #[ApiResource(
         //collectionOperations: ['get' => ['normalization_context' => ['groups' => 'bookings:list'] ]],
-        // itemOperations: ['get' => ['normalization_context' => ['groups' => 'booking:item']]],
+    itemOperations: [
+        'get' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
+        'patch' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
+        'post' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
+        'put' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"],
+        'delete' => ["access_control"=>"is_granted('ROLE_USER') and object.getUser().getId() == user.getId()"]
+    
+    ],
     paginationEnabled: false,
     normalizationContext: ['groups' => 'read', "datetime_format"=>"Y-m-d",],
     denormalizationContext: ['groups' => 'write', "datetime_format" => "Y-m-d|"]

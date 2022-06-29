@@ -6,6 +6,10 @@
 parameters:
 
 services:
+    App\Api\Extension\CurrentUserExtension:
+            tags:
+                - { name: api_platform.doctrine.orm.query_extension.collection }
+                - { name: api_platform.doctrine.orm.query_extension.item }
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
