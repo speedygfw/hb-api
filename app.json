@@ -4,7 +4,7 @@
   
   "cron": [
     {
-      "command": "php .\bin\console hb:cron",
+      "command": "php .\\bin\\console hb:cron",
       "schedule": "@daily"
     }
   ],
