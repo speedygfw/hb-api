@@ -10,12 +10,20 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ApiResource(
     collectionOperations: ['get' => ['normalization_context' => ['groups' => 'read'] ]],
     itemOperations: ['get' => ['normalization_context' => ['groups' => 'write']]],
     paginationEnabled: false,
+), ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'username' => SearchFilter::STRATEGY_PARTIAL
+    ]
 )]
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 /**
  * Summary of User

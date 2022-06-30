@@ -3,8 +3,7 @@
 namespace App\Tests;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
-
-
+use stdClass;
 
 class TransactionApiTest extends BudgetBookApiTest
 {
@@ -17,7 +16,7 @@ class TransactionApiTest extends BudgetBookApiTest
         [
             'ApiTest1',
             'ApiTest1',
-            169
+            190
         ],
         'ApiTest2' => [
             'ApiTest2',
@@ -76,7 +75,7 @@ class TransactionApiTest extends BudgetBookApiTest
     public function testSingleTransactionWrongUser()
     {
         $client = static::createClient();
-        $this->logIn($client, 'johanna', 'drack2020');
+        $this->logIn($client, "ApiTest2", 'ApiTest2');
 
 
         $headers = array(
@@ -97,6 +96,63 @@ class TransactionApiTest extends BudgetBookApiTest
         $client = static::createClient();
         $response = $client->request('GET', '/api/bookings');
         $this->assertResponseStatusCodeSame(401);
+    }
+
+    public function testCreateTransaction(){
+        // $data = '{"amount":0,"name":"aaa","bookingDate":"2022-06-30","type":1,"categories":[],"category":[],"user":{"@id":"/api/users/1"}}';
+        $client = static::createClient();
+        $user = new stdClass();
+        $id = "@id";
+        $user->$id = "/api/users/1";
+
+        $data = [
+            'amount' => 0,
+            'name' => "aaa",
+            'bookingDate' => "2022-06-30",
+            'type' => 1,
+            'user' => $user
+        ];
+ 
+       
+        $this->logIn($client, $this->loginName, $this->loginPwd);
+
+
+        $headers = array(
+            'ACCEPT' => 'application/ld+json',
+            'AUTHORIZATION' => "Bearer " . $this->token,
+            'CONTENT_TYPE' => 'application/ld+json',
+        );
+        $response = $client->request('POST', '/api/bookings',  [
+            'body' => json_encode($data),
+            'headers' => $headers]);
+        $content = json_decode($response->getContent());
+        $newId = $content->id;
+        return $newId;
+        
+    }
+
+    /**
+     * test deletion of transaction
+     * @depends testCreateTransaction
+     * @return void
+     */
+    public function testDeleteTransaction($newId){
+        $client = static::createClient();
+ 
+       
+        $this->logIn($client, $this->loginName, $this->loginPwd);
+
+        $headers = array(
+            'ACCEPT' => 'application/json',
+            'AUTHORIZATION' => "Bearer " . $this->token,
+            'CONTENT_TYPE' => 'application/json',
+        );
+        $url = '/api/bookings/' . $newId;
+        
+        $response = $client->request('DELETE', $url,  [
+            'headers' => $headers]);
+        $content = json_decode($response->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
 
