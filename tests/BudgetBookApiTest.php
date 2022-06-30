@@ -9,6 +9,14 @@ class BudgetBookApiTest extends ApiTestCase
 {
     protected $token = "";
 
+    protected function getDefaultHeaders()
+    {
+        return [
+            'AUTHORIZATION' => "Bearer " . $this->token,
+            'CONTENT_TYPE' => 'application/ld+json',
+        ];
+    }
+    
     protected function getEntityManager(): EntityManagerInterface
     {
         return self::getContainer()->get('doctrine')->getManager();

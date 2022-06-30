@@ -10,13 +10,19 @@ class TransactionApiTest extends BudgetBookApiTest
     private $loginName = 'ApiTest1';
     private $loginPwd = "ApiTest1";
 
+    /**
+     * provideTransactionData
+     * 
+     * data: [username, pwd, numOfExpectedItems]
+     * @return array<array>
+     */
     public function provideTransactionData()
     {
     return ['ApiTest1' =>
         [
             'ApiTest1',
             'ApiTest1',
-            190
+            187
         ],
         'ApiTest2' => [
             'ApiTest2',
@@ -27,66 +33,81 @@ class TransactionApiTest extends BudgetBookApiTest
     }
 
     /**
+     * Summary of provideSingleTransactionData
+     * data: [id, name, amount, type]
+     * @return array<array>
+     */
+    public function provideSingleTransactionData()
+    {
+    return ['1_Gehalt' =>
+        [
+            1,
+            'Gehalt',
+            99999,
+            0
+        ],
+        '156_Lebensmittel' => [
+            156,
+            'Lebensmittel',
+            110,
+            1
+        ],
+        '166_Friseur' => [
+            166,
+            'Friseur',
+            25,
+            1
+        ],
+    ];
+    }
+
+    /**
     * @dataProvider provideTransactionData
     */
-    public function testGetTransactions($userName, $pwd, $expectedItems): void
+    public function testGetTransactions($userName, $pwd, $numOfExpectedItems): void
     {
         
 
         $client = static::createClient();
         $this->logIn($client, $userName, $pwd);
 
-
-        $headers = array(
-            'AUTHORIZATION' => "Bearer " . $this->token,
-            'CONTENT_TYPE' => 'application/json',
-            "ACCEPT" => 'application/ld+json'
-        );
-
-
+        $headers = $this->getDefaultHeaders();
         $response = $client->request('GET', '/api/bookings',  ['headers' => $headers]);
         $content = json_decode($response->getContent());
 
         $n = "hydra:totalItems";
-        $this->assertSame($expectedItems, $content->$n);
+        $this->assertSame($numOfExpectedItems, $content->$n);
         
-        
-
     }
 
-    public function testSingleTransaction(): void
+    
+    /**
+     * testSingleTransaction
+     * @dataProvider provideSingleTransactionData
+     * @return void
+     */
+    public function testSingleTransaction($id, $name, $amount, $type): void
     {
         $client = static::createClient();
         $this->logIn($client, $this->loginName, $this->loginPwd);
 
 
-        $headers = array(
-            'AUTHORIZATION' => "Bearer " . $this->token,
-            'CONTENT_TYPE' => 'application/json',
-        );
+        $headers = $this->getDefaultHeaders();
 
-
-        $response = $client->request('GET', '/api/bookings/1',  ['headers' => $headers]);
+        $response = $client->request('GET', '/api/bookings/' . $id,  ['headers' => $headers]);
 
         $content = json_decode($response->getContent());
-        $this->assertSame("Gehalt", $content->name);
+        $this->assertSame($name, $content->name);
+        $this->assertSame($amount, $content->amount);
+        $this->assertSame($type, $content->type);
     }
 
-    public function testSingleTransactionWrongUser()
+    public function testSingleTransactionNotFound()
     {
         $client = static::createClient();
         $this->logIn($client, "ApiTest2", 'ApiTest2');
-
-
-        $headers = array(
-            'AUTHORIZATION' => "Bearer " . $this->token,
-            'CONTENT_TYPE' => 'application/json',
-        );
-
-
+        $headers = $this->getDefaultHeaders();
         $response = $client->request('GET', '/api/bookings/1',  ['headers' => $headers]);
-
-
 
         $this->expectExceptionMessage("Not Found");
         $response->getHeaders();
@@ -94,13 +115,12 @@ class TransactionApiTest extends BudgetBookApiTest
 
     public function testGetTransaction_401(){
         $client = static::createClient();
-        $response = $client->request('GET', '/api/bookings');
+        $client->request('GET', '/api/bookings');
         $this->assertResponseStatusCodeSame(401);
     }
 
-    public function testCreateTransaction(){
-        // $data = '{"amount":0,"name":"aaa","bookingDate":"2022-06-30","type":1,"categories":[],"category":[],"user":{"@id":"/api/users/1"}}';
-        $client = static::createClient();
+    private function getCreateTransactionData()
+    {
         $user = new stdClass();
         $id = "@id";
         $user->$id = "/api/users/1";
@@ -112,16 +132,19 @@ class TransactionApiTest extends BudgetBookApiTest
             'type' => 1,
             'user' => $user
         ];
+
+        return $data;
+
+    }
+    public function testCreateTransaction(){
+        $client = static::createClient();
+        $data = $this->getCreateTransactionData();
  
        
         $this->logIn($client, $this->loginName, $this->loginPwd);
 
 
-        $headers = array(
-            'ACCEPT' => 'application/ld+json',
-            'AUTHORIZATION' => "Bearer " . $this->token,
-            'CONTENT_TYPE' => 'application/ld+json',
-        );
+        $headers = $this->getDefaultHeaders();
         $response = $client->request('POST', '/api/bookings',  [
             'body' => json_encode($data),
             'headers' => $headers]);
@@ -131,6 +154,7 @@ class TransactionApiTest extends BudgetBookApiTest
         
     }
 
+
     /**
      * test deletion of transaction
      * @depends testCreateTransaction
@@ -138,20 +162,13 @@ class TransactionApiTest extends BudgetBookApiTest
      */
     public function testDeleteTransaction($newId){
         $client = static::createClient();
- 
-       
         $this->logIn($client, $this->loginName, $this->loginPwd);
 
-        $headers = array(
-            'ACCEPT' => 'application/json',
-            'AUTHORIZATION' => "Bearer " . $this->token,
-            'CONTENT_TYPE' => 'application/json',
-        );
+        $headers = $this->getDefaultHeaders();
         $url = '/api/bookings/' . $newId;
         
-        $response = $client->request('DELETE', $url,  [
-            'headers' => $headers]);
-        $content = json_decode($response->getContent());
+        $client->request('DELETE', $url,  ['headers' => $headers]);
+
         $this->assertResponseIsSuccessful();
     }
 
