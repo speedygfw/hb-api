@@ -30,7 +30,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[Groups(['read'])]
+    #[Groups(['read', 'write'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

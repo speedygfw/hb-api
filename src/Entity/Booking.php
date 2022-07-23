@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotNull;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ApiResource(
         //collectionOperations: ['get' => ['normalization_context' => ['groups' => 'bookings:list'] ]],
@@ -77,7 +78,7 @@ class Booking
     #[Groups(['read', 'write'])]
     private $amount;
 
-    #[NotBlank]
+    
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['read', 'write'])]
     private $name;

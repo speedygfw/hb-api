@@ -8,6 +8,8 @@
 /var/
 /vendor/
 /config/jwt/
+/.history
+
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###
