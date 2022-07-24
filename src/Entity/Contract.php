@@ -69,7 +69,7 @@ class Contract
     #[ORM\Column(type: 'date', nullable: true)]
     private $lastAccomplished;
 
-    #[Groups(['read'])]
+    #[Groups(['read', 'write'])]
     #[ORM\ManyToMany(
         targetEntity: Category::class,
         inversedBy: 'contracts',
